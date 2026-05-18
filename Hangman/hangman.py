@@ -4,7 +4,7 @@ class Hangman:
     MASK_CHAR = '_'
     RIGHT = 1
     WRONG = 0
-    EXIST = -1
+    ERROR = -1
     WIN = 1
     LOOSE = 0
     CONTINUE = -1
@@ -12,8 +12,19 @@ class Hangman:
         self.word = random.choice(word_list).upper()
         self.display_word = Hangman.MASK_CHAR * len(self.word)
         self.num_try = 0
+        self.input_letters = []
+        self.error_status = ""
     def check_letter(self, letter):
+        if not letter.isalpha():
+            self.error_status = '알파벳을 입력하세요.'
+            return Hangman.ERROR
         letter = letter.upper()
+        # 이미 입력했던 문자인지 확인
+        if letter in self.input_letters:
+            self.error_status = f'이미 입력한 알파벳입니다. {self.input_letters}'
+            return Hangman.ERROR
+
+        self.input_letters.append(letter)
         if self.word.count(letter) > 0:
             for i in range(len(self.word)):
                 if self.word[i] == letter:
