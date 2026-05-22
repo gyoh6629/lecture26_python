@@ -49,10 +49,10 @@ class MemberService:
         member_list = self.__dao.get_member_info(id)
         return member_list
 
-    def update_member_info(self):
+    def update_member_info(self, id, password):
         return self.__dao.update_member_info(id, password)
 
-    def remove_member(self):
+    def remove_member(self, id):
         return self.__dao.remove_member(id)
 #================================
 # 회원 데이터 접근 (CRUD) : MemberDAO
