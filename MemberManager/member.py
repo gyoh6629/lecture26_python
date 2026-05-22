@@ -1,70 +1,91 @@
+#==============================
+# 데이터 모델 정의 : Member
 class Member:
-    def __init__(self, num, id, pw, name, phone, add):
-        self.__num = num
+    def __init__(self, id, password, name):
+        self.__member_no = 0
         self.__id = id
-        self.__pw = pw
+        self.__password = password
         self.__name = name
-        self.__phone = phone
-        self.__add = add
-    def __str__(self):
-        return f'{self.__num}\t\t{self.__id}\t\t{self.__pw}\t\t{self.__name}\t\t{self.__phone}\t\t{self.__add}'
-    
-    def modify(self, num, id, pw, name, phone, add):
-        if num != None:
-            self.__num = num
-        if id != None:
-            self.__id = id
-        if pw != None:
-            self.__pw = pw
-        if name != None:
-            self.__name = name
-        if phone != None:
-            self.__phone = phone
-        if add != None:
-            self.__add = add
-    def get_num(self):
-        return self.__num
+
+    def get_member_no(self):
+        return self.__member_no
     def get_id(self):
         return self.__id
-    def get_pw(self):
-        return self.__pw
+    def get_password(self):
+        return self.__password
     def get_name(self):
         return self.__name
-    def get_phone(self):
-        return self.__phone
-    def get_add(self):
-        return self.__add
-    
-class MemberService:
-    def __init__(self):
-        self.__member_list = []
-        self.__basic_list = []
+    def set_password(self, password):
+        self.__password = password
 
-    def join_member(self, num, id, pw, name, phone, add):
-        new_member = Member(num, id, pw, name, phone, add)
-        basic_information = Member(num, id, None, None, None, None)
-        self.__member_list.append(new_member)
-        self.__basic_list.append(basic_information)
+    def __str__(self):
+        return f'{self.__member_no}\t{self.__id}\t{self.__name}\t{self.__password}'
+    
+#====================================
+# 회원 관리 서비스 로직 (Controller) : MemberService
+class MemberService:
+    def __init__(self, memberDao):
+        self.__dao = memberDao
+    
+    def join(self, member):
+        # 이미 있는 아이디인지 확인
+        if self.__dao.is_exist(member.get_id()):
+            return False
+        self.__dao.insert_member(member)
         return True
-    def list_member(self):
-        return self.__basic_list
-    def list_member_details(self, num):
-        for find_member in self.__member_list:
-            if find_member.get_num() == num:
-                return find_member
+    
+    def login(self, id, password):
+        member = self.__dao.get_member_info(id)
+        if member:
+            if password == member.get_password():
+                return id
+        return None
+    
+    def list_members(self):
+        member_list = self.__dao.get_all_members()
+        return member_list
+
+    def list_member_info(self, id):
+        member_list = self.__dao.get_member_info(id)
+        return member_list
+
+    def update_member_info(self):
+        return self.__dao.update_member_info(id, password)
+
+    def remove_member(self):
+        return self.__dao.remove_member(id)
+#================================
+# 회원 데이터 접근 (CRUD) : MemberDAO
+class MemberDAO:
+    def __init__(self):
+        self.__memberDB = {}
+
+    def insert_member(self, member):
+        self.__memberDB[member.get_id()] = member
+
+    def is_exist(self, id):
+        if id in self.__memberDB.keys() : return True
+        return False
+    
+    def get_member_info(self, id):
+        if self.is_exist(id):
+            return self.__memberDB[id]
         else:
-            return False
-    def modify_member(self, num, id, pw, name, phone, add):
-        for find_member in self.__member_list:
-            if find_member.get_num() == num:
-                find_member.modify(num, id, pw, name, phone, add)
-        for find_member in self.__basic_list:
-            if find_member.get_num() == num:
-                find_member.modify(num, id, None, None, None, None)
-        return True
-    def leave_member(self, num):
-        if not any(remain_member.get_num() == num for remain_member in self.__member_list):
-            return False
-        self.__member_list = [remain_member for remain_member in self.__member_list if remain_member.get_num() != num]
-        self.__basic_list = [remain_member for remain_member in self.__basic_list if remain_member.get_num() != num]
-        return True
+            return None
+    
+    def get_all_members(self):
+        if self.__memberDB:
+            return list(self.__memberDB.values())
+        return 
+        
+    def update_member_info(self, id, password):
+        if self.is_exist(id):
+            self.__memberDB[id].set_password(password)
+            return True
+        return False
+
+    def remove_member(self, id):
+        if self.is_exist(id):
+            del self.__memberDB[id]
+            return True
+        return False
