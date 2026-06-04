@@ -22,8 +22,8 @@ class Account:
     def __str__(self):
         return f'번호 = {self.__account_no} 계좌주 = {self.__owner} 잔액 = {self.__balance} 비밀번호 = {self.__password}'
     
-if __name__ == '__main__':
-    ac = Account('111111', 'asdf', 10000, '1234')
-    ac.set_balance(20000)
-    print(ac)
-    print(ac.get_account_no())
+# if __name__ == '__main__':
+#     ac = Account('111111', 'asdf', 10000, '1234')
+#     ac.set_balance(20000)
+#     print(ac)
+#     print(ac.get_account_no())

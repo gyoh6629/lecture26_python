@@ -43,29 +43,29 @@ class AccountDAO:
             return True
         return False
 
-if __name__ == '__main__':
-    dao = AccountDAO()
+# if __name__ == '__main__':
+#     dao = AccountDAO()
     
-    ac_list = dao.select_all_accounts()
-    print(ac_list)
+#     ac_list = dao.select_all_accounts()
+#     print(ac_list)
     
-    dao.insert_account(Account('111111', 'asdf', 10000, '1234'))
-    dao.insert_account(Account('111112', 'fdsa', 20000, '1234'))
-    dao.insert_account(Account('111113', 'gerh', 43000, '1234'))
+#     dao.insert_account(Account('111111', 'asdf', 10000, '1234'))
+#     dao.insert_account(Account('111112', 'fdsa', 20000, '1234'))
+#     dao.insert_account(Account('111113', 'gerh', 43000, '1234'))
     
-    for account in dao.select_all_accounts():
-        print(account)
+#     for account in dao.select_all_accounts():
+#         print(account)
     
-    print(dao.select_account_by_account_no('111116'))
+#     print(dao.select_account_by_account_no('111116'))
     
-    for account in dao.select_accounts_by_member_id('asdf'):
-        print(account)
-    print()
+#     for account in dao.select_accounts_by_member_id('asdf'):
+#         print(account)
+#     print()
     
-    print(dao.select_account_by_account_no('111112'))
-    dao.update_account('111112', Account('111112', 'qwrtysd', 123458, '53213'))
-    print(dao.select_account_by_account_no('111112'))
-    print()
+#     print(dao.select_account_by_account_no('111112'))
+#     dao.update_account('111112', Account('111112', 'qwrtysd', 123458, '53213'))
+#     print(dao.select_account_by_account_no('111112'))
+#     print()
 
-    dao.delete_account('111112')
-    print(dao.select_account_by_account_no('111112'))
+#     dao.delete_account('111112')
+#     print(dao.select_account_by_account_no('111112'))
