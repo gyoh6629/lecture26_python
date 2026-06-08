@@ -1,8 +1,22 @@
+# import joblib
 #================================
 # 회원 데이터 접근 (CRUD) : MemberDAO
 class MemberDAO:
     def __init__(self):
+        # MEMBER_DB_FILE = './db/memberDB.pkl'
+        # self.__memberDB = self.__load_memberDB()
         self.__memberDB = {} # 키 : 회원번호, 값 : 객체(member, 회원정보)
+
+    # def __load_memberDB(self):
+    #     # 파일이 존재하는지 확인하는 예외처리 추가
+    #     try:
+    #         self.__memberDB = joblib.load(MemberDAO.MEMBER_DB_FILE)
+    #     except FileNotFoundError:
+    #         self.__memberDB = {}
+        
+    # def save_memberDB(self):
+    #     if self.__memberDB:
+    #         joblib.dump(self.__memberDB, MemberDAO.MEMBER_DB_FILE)
 
     def is_exist(self, id): # 해당 회원번호가 이미 있는지 확인
         return self.get_member_by_id(id) is not None
