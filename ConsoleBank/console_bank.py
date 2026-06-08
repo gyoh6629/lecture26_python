@@ -12,6 +12,7 @@ class ConsoleBank:
     admin_menu = ['로그아웃', '회원관리', '계좌관리'] # 관리자 메뉴
     admin_account_menu = ['돌아가기', '전체계좌목록', '회원별계좌목록'] # 계좌관리 메뉴
     admin_member_menu = ['돌아가기', '회원목록', '회원정보조회', '회원강퇴'] # 회원관리 메뉴
+    balance_confirm = ['아니요', '예']
 
     def __init__(self):
         self.msv = MemberService(MemberDAO()) # 멤버서비스
@@ -162,14 +163,40 @@ class ConsoleBank:
         else:
             print('계좌생성에 실패하였습니다.')
 
+    def remain_balance(self, id): # 해당 계정에 잔액이 남았는지 확인 ( 공통 ) / 회원 > 해지, 탈퇴 / 관리자 > 강퇴
+        accounts = self.asv.get_members_accounts(id)
+        balance = 0
+        for account in accounts:
+            balance += account.get_balance()
+        if balance == 0:
+            return False
+        else:
+            return True
+
     def menu_delete_account(self): # 회원 메뉴 > 계좌 해지
         account_no = input('해지할 계좌번호 입력 : ')
         id = input('아이디 입력 : ')
         password = input('패스워드 입력 : ')
-        if self.asv.delete_account(id, account_no, password):
-            print('해당 계좌가 해지되었습니다.')
+        if self.remain_balance(self.msv.current_user):
+            menu = self.run_balance_menu()
+            if menu == 0:
+                return
+            elif menu == 1:
+                if self.asv.delete_account(id, account_no, password):
+                    print('해당 계좌가 해지되었습니다.')
+                else:
+                    print('해지에 실패하였습니다.')
         else:
-            print('해지에 실패하였습니다.')
+            if self.asv.delete_account(id, account_no, password):
+                    print('해당 계좌가 해지되었습니다.')
+            else:
+                print('해지에 실패하였습니다.')
+
+    def run_balance_menu(self):
+        print('해당 회원 계정의 1개 이상 계좌에 잔액이 남아있습니다')
+        print('탈퇴 하시겠습니까?')
+        menu = self.select_menu(ConsoleBank.balance_confirm)
+        return menu
 
     def menu_myinfo(self): # 회원 메뉴 > 내 정보
         self.run_my_info_menu()
@@ -202,9 +229,19 @@ class ConsoleBank:
 
     def menu_delete_membership(self): # 내 정보 메뉴 > 회원탈퇴
         password = input('패스워드 입력 : ')
-        if password == self.msv.view_member_info(self.msv.current_user).get_password():
-            self.msv.remove_member(self.msv.current_user)
-            self.msv.logout()
+        if self.remain_balance(self.msv.current_user):
+            menu = self.run_balance_menu()
+            if menu == 0:
+                print('탈퇴를 취소하였습니다.')
+                return
+            elif menu == 1:
+                if password == self.msv.view_member_info(self.msv.current_user).get_password():
+                    self.msv.remove_member(self.msv.current_user)
+                    self.msv.logout()
+        else:
+            if password == self.msv.view_member_info(self.msv.current_user).get_password():
+                self.msv.remove_member(self.msv.current_user)
+                self.msv.logout()
 #-----------------------------------------------------------------------
     def run_admin_menu(self): # 관리자 메뉴 보여주기
         while True:
@@ -238,16 +275,16 @@ class ConsoleBank:
                 print('없는 메뉴입니다.')
 
     def menu_list_all_accounts(self): # 계좌관리 메뉴 > 전체 계좌목록
-        try:
-            self.asv.get_all_accounts()
-        except Exception:
+        if self.asv.get_all_accounts():
+            print()
+        else:
             print('현재 등록된 계좌가 없습니다.')
 
     def menu_list_member_accounts(self): # 계좌관리 메뉴 > 회원 별 계좌목록
         id = input('회원 아이디 입력 : ')
-        try:
-            self.list_members_accounts(id)
-        except Exception:
+        if self.list_members_accounts(id):
+            print()
+        else:
             print('존재하지 않는 회원입니다.')
 #-----------------------------------------------------------------------
     def run_admin_member_menu(self): # ( 관리자 )회원관리 메뉴 보여주기
@@ -272,17 +309,22 @@ class ConsoleBank:
 
     def menu_view_member_info(self): # 회원관리 메뉴 > 회원 정보 조회
         id = input('회원 아이디 입력 : ')
-        try:
-            self.msv.view_member_info(id)
-        except Exception:
+        if self.msv.view_member_info(id):
+            print()
+        else:
             print('존재하지 않는 회원입니다.')
 
     def menu_delete_member(self): # 회원관리 메뉴 > 회원 강퇴(탈퇴)
         id = input('회원 아이디 입력 : ')
-        try:
-            self.msv.remove_member(id)
-        except Exception:
-            print('존재하지 않는 회원입니다.')
+        if self.remain_balance(id):
+            print('해당 회원의 1개 이상 계좌에 잔액이 남아있습니다.')
+            return
+        else:
+            if self.msv.remove_member(id):
+                print('회원이 탈퇴되었습니다.')
+            else:
+                print('존재하지 않는 회원입니다.')
+
 
 
 if __name__ == '__main__':
