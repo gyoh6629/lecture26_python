@@ -327,7 +327,7 @@ class BookStore:
             else:
                 print('없는 메뉴입니다.')
 
-    def admin_book_menu_1(self):
+    def admin_book_menu_1(self): # 도서추가
         book_list = self.bs.view_book_list()
         if book_list:
             for list in book_list:
@@ -341,36 +341,71 @@ class BookStore:
             print('도서가 추가되었습니다.')
             return
         print('도서를 추가하는데 실패하였습니다.')
+
+    def admin_book_menu_2(self): # 재고수정
+        new_stock = input('재고 입력 : ')
+        if self.bs.modify_stock(new_stock):
+            print('재고가 수정되었습니다.')
+            return
+        print('재고를 수정하는데 실패하였습니다.')
+
+    def admin_book_menu_3(self): # 도서삭제
+        book_number = input('도서번호 입력 : ')
+        if self.bs.delete_book(book_number):
+            print('해당 도서가 삭제되었습니다')
+            return
+        print('도서를 삭제하는데 실패하였습니다.')
 #-----------------------------------------------------------------------관리자메뉴 > 주문관리
     def show_admin_order_menu(self):
         while True:
             menu = self.select_menu(BookStore.admin_order_menu)
             if menu == 0: # 돌아가기
                 break 
-            elif menu == 1: # 도서관리
-                self.admin_menu_1()
-            elif menu == 2: # 주문관리
-                self.admin_menu_2()
-            elif menu == 3: # 회원관리
-                self.admin_menu_3()
+            elif menu == 1: # 주문목록
+                self.admin_order_menu_1()
+            elif menu == 2: # 회원 별 주문내역
+                self.admin_order_menu_2()
             else:
                 print('없는 메뉴입니다.')
+
+    def admin_order_menu_1(self): # 주문목록
+        for order_list in self.os.list_order():
+            print(order_list)
+
+    def admin_order_menu_2(self): # 회원 별 주문내역
+        id = input('아이디 입력 : ')
+        user_number = self.us.view_user_number(id)
+        order_list = self.os.list_order_by_user(user_number)
+        if order_list:
+            for order in order_list:
+                print(order)
+                return
+        print('주문내역이 없습니다')
 #-----------------------------------------------------------------------관리자메뉴 > 회원관리
     def show_admin_user_menu(self):
         while True:
             menu = self.select_menu(BookStore.admin_user_menu)
             if menu == 0: # 돌아가기
-
                 break 
-            elif menu == 1: # 도서관리
-                self.admin_menu_1()
-            elif menu == 2: # 주문관리
-                self.admin_menu_2()
-            elif menu == 3: # 회원관리
-                self.admin_menu_3()
+            elif menu == 1: # 회원목록
+                self.admin_user_menu_1()
+            elif menu == 2: # 회원퇴출
+                self.admin_user_menu_2()
             else:
                 print('없는 메뉴입니다.')
 
-admin_book_menu = ['돌아가기', ,'도서추가', '재고수정', '도서삭제'] # 도서관리
-    admin_order_menu = ['돌아가기', '주문목록', '회원 별 주문내역'] # 주문관리
-    admin_user_menu = ['돌아가기', '회원목록', '회원퇴출'] # 회원관리
+    def admin_user_menu_1(self): # 회원목록
+        for list in self.us.view_list_user():
+            print(list)
+
+    def admin_user_menu_2(self): # 회원퇴출
+        id = input('아이디 입력 : ')
+        if self.us.withdrawal_by_admin(id):
+            print('회원이 퇴출되었습니다.')
+            return
+        print('회원을 퇴출하는데 실패하였습니디ㅏ')
+
+
+# admin_book_menu = ['돌아가기', ,'도서추가', '재고수정', '도서삭제'] # 도서관리
+#     admin_order_menu = ['돌아가기', '주문목록', '회원 별 주문내역'] # 주문관리
+#     admin_user_menu = ['돌아가기', '회원목록', '회원퇴출'] # 회원관리
